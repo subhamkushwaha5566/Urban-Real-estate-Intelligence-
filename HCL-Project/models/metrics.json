@@ -1,0 +1,27 @@
+{
+  "results": {
+    "Random Forest": {
+      "r2": 0.9406,
+      "rmse": 46291.74,
+      "mae": 29240.82
+    },
+    "Gradient Boosting": {
+      "r2": 0.9472,
+      "rmse": 43627.39,
+      "mae": 25953.03
+    },
+    "AdaBoost": {
+      "r2": 0.7794,
+      "rmse": 89216.45,
+      "mae": 65922.83
+    },
+    "Stacking Ensemble": {
+      "r2": 0.9483,
+      "rmse": 43192.89,
+      "mae": 25687.91
+    }
+  },
+  "best_model": "Stacking Ensemble",
+  "test_size": 2000,
+  "train_size": 8000
+}

@@ -1,0 +1,35 @@
+{
+  "total_properties": 10000,
+  "features_count": 21,
+  "micro_markets": {
+    "South": 2517,
+    "East": 2501,
+    "West": 2005,
+    "North": 1507,
+    "Center": 1470
+  },
+  "sectors": {
+    "Social Rental": 5075,
+    "Home Ownership": 3088,
+    "Private Rental": 1837
+  },
+  "valuation_stats": {
+    "mean": 436820.42,
+    "median": 384500.0,
+    "min": 115500.0,
+    "max": 1955200.0,
+    "std": 198879.37
+  },
+  "avg_valuation_by_market": {
+    "Center": 564956.6,
+    "East": 413953.06,
+    "North": 332986.2,
+    "South": 482100.4,
+    "West": 392600.75
+  },
+  "avg_valuation_by_sector": {
+    "Home Ownership": 581322.12,
+    "Private Rental": 538229.67,
+    "Social Rental": 312187.9
+  }
+}

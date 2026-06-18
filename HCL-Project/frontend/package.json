@@ -1,0 +1,12 @@
+{
+  "name": "urei-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "vite": "^8.0.16"
+  }
+}

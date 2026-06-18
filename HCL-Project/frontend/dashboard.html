@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Urban Real Estate Intelligence — Estimating Property Valuations Across Metro Micro-Markets Using PCA and Ensemble Regression">
+  <title>Urban Real Estate Intelligence | Property Valuation Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🏠</div>
+        <div>
+          <div class="logo-text">UREI Dashboard</div>
+          <div class="logo-subtitle">Real Estate Intelligence</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-section="dashboard" id="nav-dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a class="nav-item" data-section="pca" id="nav-pca">
+        <span class="nav-icon">🔬</span> PCA Analysis
+      </a>
+      <a class="nav-item" data-section="models" id="nav-models">
+        <span class="nav-icon">🤖</span> Model Performance
+      </a>
+      <a class="nav-item" data-section="predictor" id="nav-predictor">
+        <span class="nav-icon">💰</span> Valuation Predictor
+      </a>
+      <a class="nav-item" data-section="map" id="nav-map">
+        <span class="nav-icon">🗺️</span> Micro-Market Map
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p>Urban Real Estate Intelligence v1.0</p>
+      <p style="margin-top:4px;">PCA + Ensemble Regression</p>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main-content">
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="18" height="2" rx="1" fill="currentColor"></rect>
+              <rect y="5" width="18" height="2" rx="1" fill="currentColor" opacity="0.8"></rect>
+              <rect y="10" width="18" height="2" rx="1" fill="currentColor" opacity="0.6"></rect>
+            </svg>
+          </button>
+
+          <h1 class="page-title">Urban Real Estate <span>Intelligence</span></h1>
+        </div>
+
+        <div class="top-bar-right">
+          <div class="search-wrap" id="search-wrap">
+            <input type="search" id="top-search" class="top-search" placeholder="Search sections, markets, models..." aria-label="Search" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="search-results" aria-autocomplete="list">
+            <div class="search-results" id="search-results" role="listbox" hidden></div>
+          </div>
+
+          <div class="status-badge" id="status-badge">
+            <span class="status-dot"></span>
+            Models Loaded
+          </div>
+
+          <div class="top-controls">
+            <div class="user-dropdown" id="user-dropdown">
+              <button type="button" class="avatar" id="avatar-btn" aria-label="User menu" aria-haspopup="true" aria-expanded="false" aria-controls="user-menu">UREI</button>
+              <div class="user-menu" id="user-menu" role="menu" hidden>
+                <a href="/login" role="menuitem">Sign In</a>
+                <a href="/register" role="menuitem">Register</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- ─── DASHBOARD SECTION ─── -->
+    <section class="section active" id="section-dashboard">
+      <div class="section-header">
+        <h2 class="section-title">Overview</h2>
+        <p class="section-subtitle">Key metrics from 10,000 properties across 5 metro micro-markets</p>
+      </div>
+
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Properties</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-change positive">Synthetic Dataset</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Features</div>
+          <div class="stat-value" id="stat-features">—</div>
+          <div class="stat-change positive">Before PCA</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Mean Valuation</div>
+          <div class="stat-value" id="stat-mean-val">—</div>
+          <div class="stat-change positive">₹</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Best Model R²</div>
+          <div class="stat-value" id="stat-best-r2">—</div>
+          <div class="stat-change positive" id="stat-best-name">—</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Valuations by Micro-Market</h3>
+            <span class="chart-badge">Average ₹</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-market-val" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-market-val"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Valuations by Sector</h3>
+            <span class="chart-badge">Average ₹</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-sector-val" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-sector-val"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Market Distribution</h3>
+            <span class="chart-badge">Count</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-market-dist" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-market-dist"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Sector Distribution</h3>
+            <span class="chart-badge">Count</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-sector-dist" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-sector-dist"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── PCA SECTION ─── -->
+    <section class="section" id="section-pca">
+      <div class="section-header">
+        <h2 class="section-title">PCA Dimensionality Reduction</h2>
+        <p class="section-subtitle">Principal Component Analysis reducing feature space while preserving 95%+ variance</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Original Features</div>
+          <div class="stat-value" id="pca-original">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">PCA Components</div>
+          <div class="stat-value" id="pca-components">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Variance Retained</div>
+          <div class="stat-value" id="pca-variance">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Reduction</div>
+          <div class="stat-value" id="pca-reduction">—</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <h3 class="chart-title">Explained Variance Ratio per Component</h3>
+            <span class="chart-badge">Cumulative</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-pca-variance" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-pca-variance"></canvas>
+          </div>
+        </div>
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <h3 class="chart-title">PCA Component Feature Importances (Random Forest)</h3>
+            <span class="chart-badge">Relative</span>
+          </div>
+          <div class="feature-bar-container" id="pca-importance-bars"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MODELS SECTION ─── -->
+    <section class="section" id="section-models">
+      <div class="section-header">
+        <h2 class="section-title">Ensemble Model Performance</h2>
+        <p class="section-subtitle">Comparison of Random Forest, Gradient Boosting, AdaBoost, and Stacking Ensemble</p>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">R² Score Comparison</h3>
+            <span class="chart-badge">Higher is Better</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-r2" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-r2"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">RMSE Comparison (₹)</h3>
+            <span class="chart-badge">Lower is Better</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-rmse" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-rmse"></canvas>
+          </div>
+        </div>
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <h3 class="chart-title">Actual vs Predicted Valuations</h3>
+            <span class="chart-badge">Stacking Ensemble</span>
+          </div>
+          <div class="chart-container" style="position:relative;">
+            <div class="skeleton skeleton-chart" data-skel-for="chart-actual-pred" aria-hidden="true" style="position:absolute; inset:0;"></div>
+            <canvas id="chart-actual-pred"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table-wrapper">
+        <table class="data-table" id="metrics-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>R² Score</th>
+              <th>RMSE (₹)</th>
+              <th>MAE (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="metrics-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── PREDICTOR SECTION ─── -->
+    <section class="section" id="section-predictor">
+      <div class="section-header">
+        <h2 class="section-title">Property Valuation Predictor</h2>
+        <p class="section-subtitle">Enter property features to get an AI-powered valuation estimate</p>
+      </div>
+
+      <div class="predict-grid">
+        <div class="form-card">
+          <h3 class="chart-title" style="margin-bottom:20px;">Property Features</h3>
+
+          <div class="form-group">
+            <label class="form-label" for="input-market">Micro-Market</label>
+            <select class="form-select" id="input-market">
+              <option value="Center">Center</option>
+              <option value="South">South</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+              <option value="North">North</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-sector">Sector</label>
+            <select class="form-select" id="input-sector">
+              <option value="Home Ownership">Home Ownership</option>
+              <option value="Private Rental">Private Rental</option>
+              <option value="Social Rental">Social Rental</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Location Coordinates</label>
+            <div style="display: flex; gap: 10px;">
+              <div style="flex: 1;">
+                <span class="range-value" style="float:none; display:block; margin-bottom:4px; font-size:11px;">Latitude</span>
+                <input type="number" step="0.0001" class="form-input" id="input-lat" value="52.3700">
+              </div>
+              <div style="flex: 1;">
+                <span class="range-value" style="float:none; display:block; margin-bottom:4px; font-size:11px;">Longitude</span>
+                <input type="number" step="0.0001" class="form-input" id="input-lon" value="4.8950">
+              </div>
+            </div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+              💡 Tip: Click on the <strong>Micro-Market Map</strong> to select coordinates directly!
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-rooms">Rooms</label>
+            <div class="range-wrapper">
+              <input type="range" class="range-slider" id="input-rooms" min="2" max="5" value="3" step="1">
+              <span class="range-value" id="val-rooms">3</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-area">Floor Area (m²)</label>
+            <div class="range-wrapper">
+              <input type="range" class="range-slider" id="input-area" min="25" max="200" value="80" step="5">
+              <span class="range-value" id="val-area">80</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-quality">Quality Score</label>
+            <div class="range-wrapper">
+              <input type="range" class="range-slider" id="input-quality" min="0" max="1" value="0.7" step="0.05">
+              <span class="range-value" id="val-quality">0.70</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-age">Building Age (years)</label>
+            <div class="range-wrapper">
+              <input type="range" class="range-slider" id="input-age" min="1" max="100" value="20" step="1">
+              <span class="range-value" id="val-age">20</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-energy">Energy Label (1=A, 7=G)</label>
+            <div class="range-wrapper">
+              <input type="range" class="range-slider" id="input-energy" min="1" max="7" value="3" step="1">
+              <span class="range-value" id="val-energy">3</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-transit">Transit Proximity</label>
+            <div class="range-wrapper">
+              <input type="range" class="range-slider" id="input-transit" min="0" max="1" value="0.7" step="0.05">
+              <span class="range-value" id="val-transit">0.70</span>
+            </div>
+          </div>
+
+          <button class="btn-predict" id="btn-predict" type="button">
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span class="btn-text">⚡ Estimate Valuation</span>
+          </button>
+        </div>
+
+        <div class="result-card" id="result-card">
+          <div class="skeleton skeleton-chart" data-skel-for="result-card" aria-hidden="true" style="position:absolute; inset:0; display:none;"></div>
+          <div class="empty-state" id="result-empty">
+            <div class="empty-state-icon">🏠</div>
+            <p class="empty-state-text">Configure property features and click<br><strong>"Estimate Valuation"</strong> to see the prediction</p>
+          </div>
+          <div id="result-content" style="display:none; width:100%;">
+            <div class="result-label">Estimated Property Valuation</div>
+            <div class="result-value" id="result-value">—</div>
+            <div class="result-confidence" id="result-confidence">High Confidence</div>
+            <div class="result-details" id="result-details"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MAP SECTION ─── -->
+    <section class="section" id="section-map">
+      <div class="section-header">
+        <h2 class="section-title">Micro-Market Spatial Map</h2>
+        <p class="section-subtitle">Interactive visualization of property locations across 5 metro micro-markets</p>
+      </div>
+
+      <div class="map-filters-bar">
+        <div class="filter-group">
+          <label class="filter-label" for="map-filter-market">Micro-Market</label>
+          <select class="form-select map-filter" id="map-filter-market">
+            <option value="All">All Markets</option>
+            <option value="Center">Center</option>
+            <option value="South">South</option>
+            <option value="East">East</option>
+            <option value="West">West</option>
+            <option value="North">North</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="map-filter-sector">Sector</label>
+          <select class="form-select map-filter" id="map-filter-sector">
+            <option value="All">All Sectors</option>
+            <option value="Home Ownership">Home Ownership</option>
+            <option value="Private Rental">Private Rental</option>
+            <option value="Social Rental">Social Rental</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="map-color-mode">Color Mode</label>
+          <select class="form-select map-filter" id="map-color-mode">
+            <option value="market">Color by Micro-Market</option>
+            <option value="sector">Color by Sector</option>
+            <option value="valuation">Color by Valuation (Heatmap)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="map-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Property Distribution</h3>
+          <span class="chart-badge" id="map-count">Loading...</span>
+        </div>
+        <div class="canvas-container" style="position: relative;">
+          <div class="skeleton skeleton-chart" data-skel-for="map-canvas" aria-hidden="true" style="position:absolute; inset:0;"></div>
+          <canvas id="map-canvas"></canvas>
+          <div class="map-tooltip" id="map-tooltip" style="display: none;"></div>
+        </div>
+        <div class="map-legend" id="map-legend">
+          <!-- Dynamic legend -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>

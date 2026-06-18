@@ -1,0 +1,16 @@
+.venv/
+.venv-1/
+__pycache__/
+*.py[cod]
+*.db
+.env
+.idea/
+.DS_Store
+instance/
+frontend/js/config.js
+frontend/dist/
+frontend/node_modules/
+models/*.pkl
+models/random_forest.pkl
+
+models/stacking_ensemble.pkl
